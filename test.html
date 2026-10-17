@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rust WGPU Demo</title>
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script type="module">
+        import init from "./pkg/wgpu_renderer.js";
+
+        async function main() {
+            await init();
+            console.log("WASM initialized");
+        }
+
+        main().catch(console.error);
+    </script>
+</body>
+</html>
