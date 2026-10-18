@@ -10,19 +10,37 @@
         }
         canvas {
             display: block;
+            /* Keep layout independent of the WebGL drawing buffer size. */
+            width: 800px;
+            height: 600px;
         }
     </style>
 </head>
 <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <pre id="error" role="alert" hidden style="color: #ffb4b4; white-space: pre-wrap;"></pre>
     <script type="module">
-        import init from "./pkg/wgpu_renderer.js";
+        function showError(error) {
+            const message = error?.stack || error?.message || String(error);
+            const output = document.getElementById("error");
+            output.hidden = false;
+            output.textContent += `${message}\n`;
+            console.error(error);
+        }
+
+        window.addEventListener("error", event => showError(event.error || event.message));
+        window.addEventListener("unhandledrejection", event => showError(event.reason));
 
         async function main() {
-            await init();
+            // This development page should load the latest build on every reload.
+            const version = Date.now();
+            const { default: init } = await import(`./pkg/wgpu_renderer.js?v=${version}`);
+            const wasmUrl = new URL(`./pkg/wgpu_renderer_bg.wasm?v=${version}`, window.location.href);
+            await init({ module_or_path: wasmUrl });
             console.log("WASM initialized");
         }
 
-        main().catch(console.error);
+        main().catch(showError);
     </script>
 </body>
 </html>
